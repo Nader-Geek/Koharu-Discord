@@ -1,0 +1,2 @@
+bash worker/build.sh
+./out/koharu-headless --help
