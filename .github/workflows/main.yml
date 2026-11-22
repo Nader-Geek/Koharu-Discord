@@ -1,3 +1,0 @@
-cp -R worker/koharu-headless /path/to/koharu/crates/
-git -C /path/to/koharu apply "$PWD"/worker/patches/*.patch
-cargo build --release -p koharu-headless
