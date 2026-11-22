@@ -15,7 +15,7 @@
 
 على GitHub: Actions → **Build headless** → Run workflow (أو ادفع tag مثل `v1` فيُنشأ Release بالملف).
 
-محليًا على Linux x86-64 (Ubuntu 24.04 أو أحدث، ومعه `clang libclang-dev llvm pkg-config libssl-dev` وRust 1.97.1+):
+محليًا على Linux x86-64 (Ubuntu 24.04 أو أحدث، ومعه `clang libclang-dev llvm pkg-config libssl-dev libfontconfig1-dev` وRust 1.97.1+):
 
 ```bash
 bash worker/build.sh

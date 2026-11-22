@@ -48,7 +48,8 @@ jobs:
           ref: ${{ steps.pin.outputs.commit }}
           path: .build/koharu
 
-      # bindgen reads the native libraries' headers with libclang.
+      # bindgen reads the native libraries' headers with libclang, and the
+      # renderer's font enumeration links fontconfig.
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -58,7 +59,8 @@ jobs:
             libclang-dev \
             llvm \
             pkg-config \
-            libssl-dev
+            libssl-dev \
+            libfontconfig1-dev
 
       - run: rustup update stable && rustup default stable
 

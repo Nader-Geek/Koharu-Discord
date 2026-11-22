@@ -8,7 +8,8 @@
 #   bash worker/build.sh -j 2                          # extra cargo arguments
 #
 # Needs: git, a Rust toolchain (1.97.1 or later), clang and libclang for
-# bindgen, pkg-config, and OpenSSL headers.
+# bindgen, pkg-config, and the OpenSSL and fontconfig headers (on Debian and
+# Ubuntu: clang libclang-dev llvm pkg-config libssl-dev libfontconfig1-dev).
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
