@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# The worker's build: Koharu's sources and the binary
+.build/
+out/
+
+# What a running worker and bot write
+koharu-jobs/
+koharu_settings.json
+*.log
+
+.DS_Store

@@ -1,0 +1,39 @@
+diff --git a/crates/koharu-runtime/src/hardware/cuda.rs b/crates/koharu-runtime/src/hardware/cuda.rs
+index 08f2d46..4b1ae64 100644
+--- a/crates/koharu-runtime/src/hardware/cuda.rs
++++ b/crates/koharu-runtime/src/hardware/cuda.rs
+@@ -15,6 +15,18 @@ const ATTRIBUTE_COMPUTE_CAPABILITY_MINOR: c_int = 76;
+ const MIN_DRIVER_VERSION: c_int = 13030;
+ const MIN_COMPUTE_CAPABILITY: u32 = 75;
+ 
++/// The driver version the probe requires, as `cuDriverGetVersion` reports
++/// it: the bundled runtimes' own, or the one `KOHARU_MIN_CUDA_DRIVER` names.
++/// A host whose driver is an older 13.x, such as Colab's 580 (13000), can
++/// set it to try the runtimes under CUDA's minor-version compatibility, which
++/// runs SASS kernels and fails only what needs the newer driver.
++fn min_driver_version() -> c_int {
++    std::env::var("KOHARU_MIN_CUDA_DRIVER")
++        .ok()
++        .and_then(|version| version.trim().parse().ok())
++        .unwrap_or(MIN_DRIVER_VERSION)
++}
++
+ type Init = unsafe extern "C" fn(c_uint) -> c_int;
+ type DeviceGetCount = unsafe extern "C" fn(*mut c_int) -> c_int;
+ type DeviceGet = unsafe extern "C" fn(*mut c_int, c_int) -> c_int;
+@@ -53,12 +65,9 @@ impl Cuda {
+             if get_driver_version(&mut driver_version) != 0 {
+                 return None;
+             }
+-            if driver_version < MIN_DRIVER_VERSION {
+-                tracing::warn!(
+-                    driver_version,
+-                    required = MIN_DRIVER_VERSION,
+-                    "CUDA driver is too old"
+-                );
++            let required = min_driver_version();
++            if driver_version < required {
++                tracing::warn!(driver_version, required, "CUDA driver is too old");
+                 return None;
+             }
+ 
