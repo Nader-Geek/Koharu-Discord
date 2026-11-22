@@ -8,7 +8,7 @@
 
 - **ده مش تشغيل لتطبيق Koharu نفسه.** Koharu تطبيق سطح مكتب (Tauri + CEF + نافذة GPU) وخادم الـ MCP بتاعه بيشتغل بس جوه التطبيق. اللي هنا هو **worker بدون نافذة** (`koharu-headless`) مبني من مكتبات Koharu نفسها (المشروع، الـ pipeline، الراسم، تصدير PSD، والوكيل)، وبوت Discord بـ Python بيكلمه عبر HTTP محلي. الريبو الأصلي فيه أمثلة headless بنفس الفكرة (`koharu-pipeline/examples/run.rs` و`koharu-agent/examples/serve.rs`)، والـ worker مبني على نفس الـ APIs، فالناتج مطابق لتصدير التطبيق.
 - **Colab فيه عقبة واحدة حقيقية:** تعريف NVIDIA الحالي على Colab هو 580 (CUDA 13.0)، وKoharu بيرفض أي تعريف أقدم من 13.3. رقعة صغيرة هنا بتضيف متغير بيئة `KOHARU_MIN_CUDA_DRIVER` لتخطي الفحص اعتمادًا على توافق الإصدارات الفرعية في CUDA. ده **تجريبي وغير مُختبر**: لو نواة ما في libtorch أو llama.cpp مترجمة PTX فقط، التعريف الأقدم هيفشل في تشغيلها.
-- **حالة الكود:** الـ worker مكتوب على التوقيعات الفعلية في مستودع Koharu عند الـ commit المثبّت في `worker/UPSTREAM_COMMIT`، لكنه **لم يُجمَّع ولم يُشغَّل بعد**؛ أول `cargo build` (من الـ workflow هنا) هو الاختبار الحقيقي، وتوقّع تصحيحات صغيرة. البوت اتفحص بمفسّر Python فقط.
+- **حالة الكود:** الـ worker مكتوب على واجهات Koharu عند الـ commit المثبّت في `worker/UPSTREAM_COMMIT`، و**يتجمّع على GitHub Actions بدون تحذيرات** (Release `v1` فيه الملف)، لكنه **لم يُشغَّل بعد على GPU حقيقي**: أول تشغيل على Colab هو اختبار المنطق وقت التشغيل، وتوقّع تصحيحات. البوت اتفحص بمفسّر Python فقط ولم يُجرَّب على Discord بعد.
 
 ## محتويات الريبو
 
@@ -84,13 +84,13 @@ Discord ──(Gateway)──▶ bot.py (discord.py) ──HTTP 127.0.0.1:8787�
 
 ### 1) ابنِ الـ binary مرة واحدة
 
-ادفع tag في الريبو ده:
+Release `v1` موجود بالفعل وفيه `koharu-headless`. لإعادة البناء بعد تعديل في `worker/`، ادفع tag جديدًا:
 
 ```bash
-git tag v1 && git push origin v1
+git tag v2 && git push origin v2
 ```
 
-الـ workflow **Build headless** بيبني `koharu-headless` لـ Linux x86-64 على Ubuntu 24.04 (نحو 30 إلى 60 دقيقة أول مرة) وبيعمل Release فيه الملف. النوتبوك بينزّله من `releases/latest/download/koharu-headless`. أي push يلمس `worker/` بيبني كمان ويحفظ الناتج كـ artifact في صفحة الـ run. للبناء محليًا أو على fork من Koharu، شوف `worker/README.md`.
+الـ workflow **Build headless** بيبني `koharu-headless` لـ Linux x86-64 على Ubuntu 24.04 (نحو 25 دقيقة أول مرة، أقل بالكاش) وبيعمل Release فيه الملف. النوتبوك بينزّله من `releases/latest/download/koharu-headless`. أي push يلمس `worker/` بيبني كمان ويحفظ الناتج كـ artifact في صفحة الـ run. للبناء محليًا أو على fork من Koharu، شوف `worker/README.md`.
 
 **لو الريبو خاص:** رابط التنزيل العام ما بيشتغلش. أضف في Colab Secret باسم `GITHUB_TOKEN` (Fine-grained token على الريبو ده بصلاحية Contents: Read) والنوتبوك بينزّل الملف عبر الـ API تلقائيًا. زر Open in Colab كمان بيحتاج تربط Colab بحساب GitHub بتاعك. البديل الأبسط: اجعل الريبو عامًا.
 
